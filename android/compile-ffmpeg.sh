@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/bin/bash 
 
 # This script is based on projects below
 # https://github.com/yixia/FFmpeg-Android

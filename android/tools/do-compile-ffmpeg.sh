@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/bin/bash
 
 # This script is based on projects below
 # https://github.com/yixia/FFmpeg-Android
@@ -27,7 +27,7 @@ fi
 # try to detect NDK version
 FF_NDK_REL=$(grep -o '^r[0-9]*.*' $ANDROID_NDK/RELEASE.TXT 2>/dev/null|cut -b2-)
 case "$FF_NDK_REL" in
-    9?*)
+    10?*)
         # we don't use 4.4.3 because it doesn't handle threads correctly.
         if test -d ${ANDROID_NDK}/toolchains/arm-linux-androideabi-4.8
         # if gcc 4.8 is present, it's there for all the archs (x86, mips, arm)
@@ -64,7 +64,7 @@ FF_DEP_LIBS=
 FF_ASM_OBJ_DIR=
 
 #----- armv7a begin -----
-if [ "$FF_ARCH" == "armv7a" ]; then
+if [ "$FF_ARCH" = "armv7a" ]; then
     FF_BUILD_NAME=ffmpeg-armv7a
     FF_BUILD_NAME_OPENSSL=openssl-armv7a
     FF_SOURCE=$FF_BUILD_ROOT/$FF_BUILD_NAME
@@ -81,7 +81,7 @@ if [ "$FF_ARCH" == "armv7a" ]; then
 
     FF_ASM_OBJ_DIR="libavutil/arm/*.o libavcodec/arm/*.o libswresample/arm/*.o"
 
-elif [ "$FF_ARCH" == "armv5" ]; then
+elif [ "$FF_ARCH" = "armv5" ]; then
     FF_BUILD_NAME=ffmpeg-armv5
     FF_BUILD_NAME_OPENSSL=openssl-armv5
     FF_SOURCE=$FF_BUILD_ROOT/$FF_BUILD_NAME
@@ -96,7 +96,7 @@ elif [ "$FF_ARCH" == "armv5" ]; then
 
     FF_ASM_OBJ_DIR="libavutil/arm/*.o libavcodec/arm/*.o libswresample/arm/*.o"
 
-elif [ "$FF_ARCH" == "x86" ]; then
+elif [ "$FF_ARCH" = "x86" ]; then
     FF_BUILD_NAME=ffmpeg-x86
     FF_BUILD_NAME_OPENSSL=openssl-x86
     FF_SOURCE=$FF_BUILD_ROOT/$FF_BUILD_NAME
@@ -134,7 +134,7 @@ UNAMES=$(uname -s)
 UNAMESM=$(uname -sm)
 echo "build on $UNAMESM"
 FF_MAKE_TOOLCHAIN_FLAGS="--install-dir=$FF_TOOLCHAIN_PATH"
-if [ "$UNAMES" == "Darwin" ]; then
+if [ "$UNAMES" = "Darwin" ]; then
     FF_MAKE_TOOLCHAIN_FLAGS="$FF_MAKE_TOOLCHAIN_FLAGS --system=darwin-x86_64"
     FF_MAKE_FLAG=-j`sysctl -n machdep.cpu.thread_count`
 fi
@@ -143,12 +143,17 @@ FF_MAKEFLAGS=
 if which nproc >/dev/null
 then
     FF_MAKEFLAGS=-j`nproc`
-elif [ "$UNAMES" == "Darwin" ] && which sysctl >/dev/null
+elif [ "$UNAMES" = "Darwin" ] && which sysctl >/dev/null
 then
     FF_MAKEFLAGS=-j`sysctl -n machdep.cpu.thread_count`
 fi
 
 FF_TOOLCHAIN_TOUCH="$FF_TOOLCHAIN_PATH/touch"
+echo "$ANDROID_NDK/build/tools/make-standalone-toolchain.sh \
+        $FF_MAKE_TOOLCHAIN_FLAGS \
+        --platform=$FF_ANDROID_PLATFORM \
+        --toolchain=$FF_TOOLCHAIN_NAME"
+
 if [ ! -f "$FF_TOOLCHAIN_TOUCH" ]; then
     $ANDROID_NDK/build/tools/make-standalone-toolchain.sh \
         $FF_MAKE_TOOLCHAIN_FLAGS \
@@ -186,7 +191,8 @@ FF_CFLAGS="-O3 -Wall -pipe \
 #FF_CFLAGS="$FF_CFLAGS -finline-limit=300"
 
 export COMMON_FF_CFG_FLAGS=
-source $FF_BUILD_ROOT/../config/module.sh
+echo "source $FF_BUILD_ROOT/../config/modules.h"
+. $FF_BUILD_ROOT/../config/module.sh
 
 
 #--------------------
@@ -255,7 +261,7 @@ $CC -lm -lz -shared --sysroot=$FF_SYSROOT -Wl,--no-undefined -Wl,-z,noexecstack 
     $FF_DEP_LIBS \
     -o $FF_PREFIX/libijkffmpeg.so
 
-function mysedi() {
+mysedi() {
     f=$1
     exp=$2
     n=`basename $f`

@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/bin/bash
 
 REMOTE_REPO=$1
 LOCAL_WORKSPACE=$2
