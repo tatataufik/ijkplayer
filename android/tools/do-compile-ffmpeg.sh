@@ -149,13 +149,13 @@ then
 fi
 
 FF_TOOLCHAIN_TOUCH="$FF_TOOLCHAIN_PATH/touch"
-echo "$ANDROID_NDK/build/tools/make-standalone-toolchain.sh \
+echo "bash $ANDROID_NDK/build/tools/make-standalone-toolchain.sh \
         $FF_MAKE_TOOLCHAIN_FLAGS \
         --platform=$FF_ANDROID_PLATFORM \
         --toolchain=$FF_TOOLCHAIN_NAME"
 
 if [ ! -f "$FF_TOOLCHAIN_TOUCH" ]; then
-    $ANDROID_NDK/build/tools/make-standalone-toolchain.sh \
+    bash $ANDROID_NDK/build/tools/make-standalone-toolchain.sh \
         $FF_MAKE_TOOLCHAIN_FLAGS \
         --platform=$FF_ANDROID_PLATFORM \
         --toolchain=$FF_TOOLCHAIN_NAME
@@ -203,6 +203,7 @@ if [ -f "${FF_DEP_OPENSSL_LIB}/libssl.a" ]; then
 
     FF_CFLAGS="$FF_CFLAGS -I${FF_DEP_OPENSSL_INC}"
     FF_DEP_LIBS="-L${FF_DEP_OPENSSL_LIB} -lssl -lcrypto"
+    echo "openssl is enabled"
 fi
 
 
@@ -227,10 +228,13 @@ FF_CFG_FLAGS="$FF_CFG_FLAGS --enable-inline-asm"
 echo "\n--------------------"
 echo "[*] configurate ffmpeg"
 echo "--------------------"
+echo "cd $FF_SOURCE"
 cd $FF_SOURCE
 if [ -f "./config.h" ]; then
     echo 'reuse configure'
 else
+    echo "./configure $FF_CFG_FLAGS --extra-cflags=\"$FF_CFLAGS $FF_EXTRA_CFLAGS\" \
+        --extra-ldflags=\"$FF_EXTRA_LDFLAGS\""
     ./configure $FF_CFG_FLAGS \
         --extra-cflags="$FF_CFLAGS $FF_EXTRA_CFLAGS" \
         --extra-ldflags="$FF_EXTRA_LDFLAGS"
