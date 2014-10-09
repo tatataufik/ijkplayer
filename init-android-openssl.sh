@@ -11,12 +11,12 @@ TOOLS=tools
 echo "== pull openssl base =="
 echo "$TOOLS/pull-repo-base.sh $IJK_OPENSSL_UPSTREAM $IJK_OPENSSL_LOCAL_REPO"
 bash $TOOLS/pull-repo-base.sh $IJK_OPENSSL_UPSTREAM $IJK_OPENSSL_LOCAL_REPO
-function pull_fork()
+pull_fork()
 {
     echo "== pull openssl fork $1 =="
-    echo "bash $TOOLS/pull-repo-ref.sh $IJK_FFMPEG_FORK android/build/openssl-$1 ${IJK_FFMPEG_LOCAL_REPO}"
-    bash $TOOLS/pull-repo-ref.sh $IJK_FFMPEG_FORK android/build/openssl-$1 ${IJK_FFMPEG_LOCAL_REPO}
-    cd android/build/openssl-armv7a
+    echo "bash $TOOLS/pull-repo-ref.sh $IJK_OPENSSL_FORK android/openssl-$1 ${IJK_OPENSSL_LOCAL_REPO}"
+    bash $TOOLS/pull-repo-ref.sh $IJK_OPENSSL_FORK android/openssl-$1 ${IJK_OPENSSL_LOCAL_REPO}
+    cd android/openssl-$1
     git checkout ${IJK_FFMPEG_COMMIT}
     cd -
 }
